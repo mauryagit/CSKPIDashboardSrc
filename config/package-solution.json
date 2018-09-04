@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "cskpidashboard-client-side-solution",
+    "id": "6e2499e2-b7c0-425b-9081-e1b5855330c7",
+    "version": "1.0.0.0"
+  },
+  "paths": {
+    "zippedPackage": "solution/cskpidashboard.sppkg"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "isCreatingSolution": false,
+    "environment": "onprem",
+    "version": "1.5.1",
+    "libraryName": "cskpidashboard",
+    "libraryId": "6e2499e2-b7c0-425b-9081-e1b5855330c7",
+    "packageManager": "npm",
+    "componentType": "webpart"
+  }
+}

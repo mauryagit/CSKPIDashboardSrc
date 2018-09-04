@@ -1,0 +1,43 @@
+{
+  "entries": [
+    {
+      "entry": "./lib/webparts/helloWorld/HelloWorldWebPart.js",
+      "manifest": "./src/webparts/helloWorld/HelloWorldWebPart.manifest.json",
+      "outputPath": "./dist/hello-world-web-part.js"
+    },
+    {
+      "entry": "./lib/webparts/cskpiDashboard/CskpiDashboardWebPart.js",
+      "manifest": "./src/webparts/cskpiDashboard/CskpiDashboardWebPart.manifest.json",
+      "outputPath": "./dist/cskpi-dashboard-web-part.js"
+    },
+    {
+      "entry": "./lib/webparts/location/LocationWebPart.js",
+      "manifest": "./src/webparts/location/LocationWebPart.manifest.json",
+      "outputPath": "./dist/location-web-part.js"
+    },
+    {
+      "entry": "./lib/webparts/operationArea/OperationAreaWebPart.js",
+      "manifest": "./src/webparts/operationArea/OperationAreaWebPart.manifest.json",
+      "outputPath": "./dist/operation-area-web-part.js"
+    },
+    {
+      "entry": "./lib/webparts/kpiMetrics/KpiMetricsWebPart.js",
+      "manifest": "./src/webparts/kpiMetrics/KpiMetricsWebPart.manifest.json",
+      "outputPath": "./dist/kpi-metrics-web-part.js"
+    },
+    {
+      "entry": "./lib/webparts/kpiInputForm/KpiInputFormWebPart.js",
+      "manifest": "./src/webparts/kpiInputForm/KpiInputFormWebPart.manifest.json",
+      "outputPath": "./dist/kpi-input-form-web-part.js"
+    }
+  ],
+  "externals": {},
+  "localizedResources": {
+    "HelloWorldWebPartStrings": "webparts/helloWorld/loc/{locale}.js",
+    "CskpiDashboardWebPartStrings": "webparts/cskpiDashboard/loc/{locale}.js",
+    "LocationWebPartStrings": "webparts/location/loc/{locale}.js",
+    "OperationAreaWebPartStrings": "webparts/operationArea/loc/{locale}.js",
+    "KpiMetricsWebPartStrings": "webparts/kpiMetrics/loc/{locale}.js",
+    "KpiInputFormWebPartStrings": "webparts/kpiInputForm/loc/{locale}.js"
+  }
+}
