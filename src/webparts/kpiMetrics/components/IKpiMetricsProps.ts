@@ -2,5 +2,5 @@ import {IKPIMatrixDataProvider} from '../service/DataProvider/IKPIMatrixDataProv
 export interface IKpiMetricsProps {
   description: string;
   dataprovider :IKPIMatrixDataProvider;
-  operationAreas:string;
+ // operationAreas:string;
 }

@@ -13,39 +13,43 @@ import { IKpiInputFormProps } from './components/IKpiInputFormProps';
 import {SPComponentLoader} from '@microsoft/sp-loader';
 import {IKPIInputFormDataProvider} from '../kpiInputForm/service/DataProvider/IKPIInputFormDataProvider';
 import {MockData} from '../kpiInputForm/service/MockData';
+import {SharePointDataProvider} from '../kpiInputForm/service/DataProvider/SharePointDataProvider';
 SPComponentLoader.loadCss("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
 export interface IKpiInputFormWebPartProps {
   description: string;
+  //location:string;
+  year:string;
 }
 
 export default class KpiInputFormWebPart extends BaseClientSideWebPart<IKpiInputFormWebPartProps> {
 
   private _dataProvider : IKPIInputFormDataProvider;
-  public render(): void {
+  public render(): void {  
     const element: React.ReactElement<IKpiInputFormProps > = React.createElement(
       KpiInputForm,
       {
         description: this.properties.description,
-        dataprovider:this._dataProvider
+        dataprovider:this._dataProvider,      
+        year:this.properties.year
       }
     );
 
     ReactDom.render(element, this.domElement);
   }
+
+  
   public onInit():Promise<void>{
- 
+   
+    let _year:string = new Date().getFullYear().toString();
+    this.properties.year=_year;
+
     if(DEBUG &&  Environment.type == EnvironmentType.Local){   
       this._dataProvider = new MockData();     
     } else {
-     // this._dataProvider = new SharePointDataProvider();
-     // this._dataProvider.webPartContext = this.context;   
+     this._dataProvider = new SharePointDataProvider();
+      this._dataProvider.webPartContext = this.context;   
     }
-    /*this._dataProvider.getOperationArea()
-    .then((res:any[]) => {
-      debugger;
-      this.properties.oprationarea=JSON.stringify(res);
       
-    });*/
     return Promise.resolve<void>();
    }
   protected onDispose(): void {

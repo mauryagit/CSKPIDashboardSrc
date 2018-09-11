@@ -26,23 +26,19 @@ export default class KpiMetricsWebPart extends BaseClientSideWebPart<IKpiMetrics
   
  public constructor(context:IWebPartContext){
   super();  
+  
 }
 
 public onInit():Promise<void>{
- 
+  
   if(DEBUG &&  Environment.type == EnvironmentType.Local){   
     this._dataProvider = new MockKPIMatrix();
     this.properties.oprationarea=JSON.stringify([{"Title": "HSEF","Sequence": 1,"ID": 1},{"Title": "Loreum","Sequence": 2,"ID": 2}]);
   } else {
     this._dataProvider = new SharePointDataProvider();
-    this._dataProvider.webPartContext = this.context;   
+    this._dataProvider.webPartContext = this.context;       
   }
-  this._dataProvider.getOperationArea()
-  .then((res:any[]) => {
-    debugger;
-    this.properties.oprationarea=JSON.stringify(res);
-    
-  });
+  
   return Promise.resolve<void>();
  }
   public render(): void {
@@ -50,8 +46,7 @@ public onInit():Promise<void>{
       KpiMetrics,
       {
         description: this.properties.description,
-        dataprovider: this._dataProvider,
-        operationAreas:this.properties.oprationarea
+        dataprovider: this._dataProvider
       }
     );
 

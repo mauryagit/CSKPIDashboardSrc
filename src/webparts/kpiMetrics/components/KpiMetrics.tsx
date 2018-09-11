@@ -9,6 +9,7 @@ import { JsonUtilities } from '@microsoft/sp-core-library';
 export interface IKPIMatrixState {
   items: any[];
   newKPI: IIteamKPI;
+  oprationareas: any[];
 }
 export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMatrixState> {
   private _dataProvider: IKPIMatrixDataProvider;
@@ -20,24 +21,25 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
     this._loadKPIMatrix();
     this.state = {
       items: [],
-      newKPI: { KPIID: 0, Title: "", Sequence: 0, Metric: "", OperationAreaTitle:"",OperationAreaID: 0, KPITargetConfig: "Generic", Target: "", KPIMatrixID: 0 }
-    }; 
+      newKPI: { KPIID: 0, Title: "", Sequence: 0, Metric: "", OperationAreaTitle: "", OperationAreaID: 0, KPITargetConfig: "Generic", Target: "", KPIMatrixID: 0 },
+      oprationareas: []
+    };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
 
-  }  
+  }
 
   protected handleChange(e: any): void {
     var tar = e.target;
-    var val = e.target.value;   
+    var val = e.target.value;
     switch (e.target.id) {
-      case "kpioperationarea":         
+      case "kpioperationarea":
         this.setState((previousState: IKPIMatrixState, props: IKpiMetricsProps): IKPIMatrixState => {
           previousState.newKPI.OperationAreaTitle = val;
-          previousState.newKPI.OperationAreaID= parseInt(tar.selectedOptions[0].getAttribute("id"));
+          previousState.newKPI.OperationAreaID = parseInt(tar.selectedOptions[0].getAttribute("id"));
           return previousState;
         });
         break;
@@ -77,7 +79,7 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
 
   private _loadKPIMatrix(): Promise<IIteamKPI[]> {
     return this._dataProvider.getKPIMatrixList()
-      .then((items: IIteamKPI[]) => {       
+      .then((items: IIteamKPI[]) => {
         this.setState((previousState: IKPIMatrixState, props: IKpiMetricsProps): IKPIMatrixState => {
           previousState.items = items;
           return previousState;
@@ -103,11 +105,11 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
     if (this.checkRequired(title)) {
       if (this.checkRequired(Sequence.toString())) {
         if (this.checkRequired(target.toString())) {
-          if (this.checkRequired(operation.toString())) {          
-          if (this.checkRequired(metric.toString())) {
-            returnval = true;
+          if (this.checkRequired(operation.toString())) {
+            if (this.checkRequired(metric.toString())) {
+              returnval = true;
+            }
           }
-        }
         }
       }
     }
@@ -120,7 +122,7 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
     let newItem: any = this.state.newKPI;
     if (this.checkDuplicate) {
       this._dataProvider.createKPIMatrix(newItem)
-        .then((resolve) => {         
+        .then((resolve) => {
           this._loadKPIMatrix(); //Not an optimise way
           this.setState((previousState: IKPIMatrixState, props: IKpiMetricsProps): IKPIMatrixState => {
             previousState.items = resolve;
@@ -138,7 +140,7 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
       Sequence: this.state.newKPI.Sequence,
       Metric: this.state.newKPI.Metric,
       OperationAreaID: this.state.newKPI.OperationAreaID,
-      OperationAreaTitle:this.state.newKPI.OperationAreaTitle,
+      OperationAreaTitle: this.state.newKPI.OperationAreaTitle,
       KPITargetConfig: this.state.newKPI.KPITargetConfig,
       Target: this.state.newKPI.Target,
       KPIMatrixID: this.state.newKPI.KPIMatrixID
@@ -183,7 +185,7 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
   }
   protected resetControl(): void {
     this.setState((previousState: IKPIMatrixState, props: IKpiMetricsProps): IKPIMatrixState => {
-      previousState.newKPI = { KPIID: 0, Title: "", Sequence: 0, Metric: "",  OperationAreaTitle:"",OperationAreaID: 0, KPITargetConfig: "Generic", Target: "", KPIMatrixID: 0 };
+      previousState.newKPI = { KPIID: 0, Title: "", Sequence: 0, Metric: "", OperationAreaTitle: "", OperationAreaID: 0, KPITargetConfig: "Generic", Target: "", KPIMatrixID: 0 };
       return previousState;
     });
     this.command = "submit";
@@ -192,6 +194,19 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
     this.deleteKPIMatrix(e);
   }
 
+  private _getOperationArea() {
+    this._dataProvider.getOperationArea()
+      .then((res: any[]) => {
+        //this.properties.oprationarea=JSON.stringify(res);
+        this.setState((previousState: IKPIMatrixState, props: IKpiMetricsProps): IKPIMatrixState => {
+          previousState.oprationareas = res;
+          return previousState;
+        });
+      });
+  }
+  public componentDidMount() {
+    this._getOperationArea();
+  }
   private deleteKPIMatrix(item: IIteamKPI): void {
     this._dataProvider.deleteKPIMatrix(item)
       .then((resolve) => {
@@ -207,19 +222,19 @@ export default class KpiMetrics extends React.Component<IKpiMetricsProps, IKPIMa
     const isActive = this.validate();
     return (
       <div className="container">
-
+        <p className="h4 mb-4"  >Add KPI Information</p>
         <form onSubmit={this.handleSubmit}>
-          <p className="h4 mb-4">Add KPI Information</p>
+
           <div className="row">
             <div className="form-group col-xs-10 col-sm-6 col-md-6 col-lg-6" style={styles}>
               <label htmlFor="kpioperationarea">
                 Select Operation Area
             </label>
               <select id="kpioperationarea" className="form-control" value={this.state.newKPI.OperationAreaTitle} onChange={this.handleChange} >
-              <option id="0">--Select--</option>
-               { JSON.parse(this.props.operationAreas).map((item) => {
-                return <option id={item["ID"]} key={item["ID"]}>{item["Title"]}</option> ;
-               })}
+                <option id="0">--Select--</option>
+                {this.state.oprationareas.map((item) => {
+                  return <option id={item["ID"]} key={item["ID"]}>{item["Title"]}</option>;
+                })}
               </select>
             </div>
             <div className="form-group col-xs-10 col-sm-6 col-md-6 col-lg-6" style={styles}>

@@ -1,16 +1,21 @@
 import { IKPIInputFormDataProvider } from './DataProvider/IKPIInputFormDataProvider';
 import { IWebPartContext } from '@microsoft/sp-webpart-base';
-import { IKPIItem,IKPILocationEventIncidentItem } from './IKPIItem';
-
+import { IKPIItem, IKPILocationEventIncidentItem, ICSKPIProps } from './IKPIItem';
+import * as lodash from '@microsoft/sp-lodash-subset';
+import { ILocationInventory } from '../service/ILocationInventory';
+import { IOperationMetric } from './IOperationMetric';
 export class MockData implements IKPIInputFormDataProvider {
     private _webPartContext: IWebPartContext;
     private weekTargetList: IKPIItem[] = [];
-    private weekEventIncident:IKPILocationEventIncidentItem[]=[];
+    private weekEventIncident: IKPILocationEventIncidentItem[] = [];
+    private weekLocationInventory: ILocationInventory[] = [];
+
+    private weekOperationMetric: IOperationMetric[] = [];
 
     constructor() {
         let items: any = this.getDummyKpiMatriclist();
         items.d.results.map((val, index) => {
-          
+
             this.AddIKPIItem({
                 KPIID: val["KPI"].ID,
                 Title: val["KPI"].Title,
@@ -24,19 +29,127 @@ export class MockData implements IKPIInputFormDataProvider {
             });
         });
 
-        let incidentItem:any= this.getDummyLocationEventIncidentlist();
+        let incidentItem: any = this.getDummyLocationEventIncidentlist();
         incidentItem.d.results.map((val, index) => {
             this.AddEventIncident({
                 EventIncidentID: val["ID"],
-                Comment:val["Comment"],
-                IncidentType:val["Commenttype"],
-                Week:"1",
-                Year:"2018",
-                LocationTitle:val["Location"].Title,
-                LocationID:val["Location"].ID
+                Comment: val["Comment"],
+                IncidentType: val["Commenttype"],
+                Week: "1",
+                Year: "2018",
+                LocationTitle: val["Location"].Title,
+                LocationID: val["Location"].ID
+            });
+        });
+
+        let locationInventoryItem: any = this.getDummyLocationInventorylist();
+        locationInventoryItem.d.results.map((val, index) => {
+
+            this.AddLocationInventory({
+                Areainacres: val["Areainacres"],
+                Builtupofficespacearea: val["Builtupofficespacearea"],
+                Cabininventory: val["Cabininventory"],
+                Cabinoccupied: val["Cabinoccupied"],
+                Cubicleinventory: val["Cubicleinventory"],
+                Cubicleoccupied: val["Cubicleoccupied"],
+                Dailybuses: val["Dailybuses"],
+                Employee: val["Employee"],
+                GETaccommodation: val["GETaccommodation"],
+                GHtransitaccommodation: val["GHtransitaccommodation"],
+                ID: val["ID"],
+                LocationId: val["Location"].ID,
+                LocationTitle: val["Location"].Title,
+                Mealserved: val["Mealserved"],
+                Monthlyhirecar: val["Monthlyhirecar"],
+                Title: val["Title"],
+                Totalstaff: val["Totalstaff"],
+                Townshipaccommodation: val["Townshipaccommodation"],
+                Week: val["Week"]
+            });
+        });
+
+        let opreationMetric = this.getDummyKPIMatircCurrentWeekData();
+        opreationMetric.d.results.map((outerVal, i) => {
+            items.d.results.map((innerVal, index) => {
+                let item: IOperationMetric;
+                if (outerVal["KPITarget"].ID == innerVal["ID"]) {
+                    item = {
+                        CurrentWeekValue: outerVal["Metricvalue"],
+                        KPITargetId: outerVal["KPITarget"].ID,
+                        KPITargetTitle: outerVal["KPITarget"].Title,
+                        Remark: outerVal["Remark"],
+                        transactionMetricId: outerVal["ID"],
+                        transactionMetricTitle: outerVal["Title"],
+                        Week: outerVal["Week"],
+                        LocationId: outerVal["Location"].ID,
+                        LocationTitle: outerVal["Location"].Title,
+                        status: "udpate",
+
+                        Title: innerVal["KPI"].Title,
+                        KPIID: innerVal["KPI"].ID,
+                        KPIMatrixID: innerVal["ID"],
+                        KPITargetConfig: innerVal["Configtype"],
+
+                        Metric: innerVal["KPI"].Metric,
+                        OperationAreaID: innerVal["Operationarea"].ID,
+                        OperationAreaTitle: innerVal["Operationarea"].Title,
+                        Sequence: innerVal["KPI"].Sequence,
+                        Target: innerVal["Title"]
+                    };
+                } else {
+                    item = {
+                        CurrentWeekValue: 0,
+                        KPITargetId: 0,
+                        KPITargetTitle: "",
+                        Remark: "",
+                        transactionMetricId: this.weekOperationMetric.length,
+                        transactionMetricTitle: "",
+                        Week: "",
+                        LocationId: 0,
+                        LocationTitle: "",
+                        status: "save",
+
+                        Title: innerVal["KPI"].Title,
+                        KPIID: innerVal["KPI"].ID,
+                        KPIMatrixID: innerVal["ID"],
+                        KPITargetConfig: innerVal["Configtype"],
+
+                        Metric: innerVal["KPI"].Metric,
+                        OperationAreaID: innerVal["Operationarea"].ID,
+                        OperationAreaTitle: innerVal["Operationarea"].Title,
+                        Sequence: innerVal["KPI"].Sequence,
+                        Target: innerVal["Title"]
+                    };
+                }
+                this.AddKPIOprationMetric(item);
             });
         });
     }
+
+    private AddKPIOprationMetric(item: IOperationMetric): void {
+        this.weekOperationMetric.push({
+            CurrentWeekValue: item.CurrentWeekValue,
+            KPIID: item.KPIID,
+            KPIMatrixID: item.KPIMatrixID,
+            KPITargetConfig: item.KPITargetConfig,
+            KPITargetId: item.KPITargetId,
+            KPITargetTitle: item.KPITargetTitle,
+            LocationId: item.LocationId,
+            LocationTitle: item.LocationTitle,
+            status: item.status,
+            Metric: item.Metric,
+            OperationAreaID: item.OperationAreaID,
+            OperationAreaTitle: item.OperationAreaTitle,
+            Remark: item.Remark,
+            Sequence: item.Sequence,
+            Target: item.Target,
+            Title: item.Title,
+            transactionMetricId: item.transactionMetricId,
+            transactionMetricTitle: item.transactionMetricTitle,
+            Week: item.Week
+        });
+    }
+
     private AddIKPIItem(item: IKPIItem): void {
         this.weekTargetList.push({
             KPIID: (item.KPIID !== 0 ? item.KPIID : this.weekTargetList.length + 1),
@@ -51,15 +164,64 @@ export class MockData implements IKPIInputFormDataProvider {
         });
     }
 
-    private AddEventIncident(item:IKPILocationEventIncidentItem):void{
+    private AddEventIncident(item: IKPILocationEventIncidentItem): void {
         this.weekEventIncident.push({
             EventIncidentID: (item.EventIncidentID !== 0 ? item.EventIncidentID : this.weekEventIncident.length + 1),
-            Comment:item.Comment,
-            IncidentType:item.IncidentType,
-            Week:item.Week,
-            Year:item.Year,
-            LocationTitle:item.LocationTitle,
-            LocationID:item.LocationID
+            Comment: item.Comment,
+            IncidentType: item.IncidentType,
+            Week: item.Week,
+            Year: item.Year,
+            LocationTitle: item.LocationTitle,
+            LocationID: item.LocationID
+        });
+    }
+
+    private AddLocationInventory(item: ILocationInventory): void {
+        this.weekLocationInventory.push({
+            Areainacres: item.Areainacres,
+            Builtupofficespacearea: item.Builtupofficespacearea,
+            Cabininventory: item.Cabininventory,
+            Cabinoccupied: item.Cabinoccupied,
+            Cubicleinventory: item.Cubicleinventory,
+            Cubicleoccupied: item.Cubicleoccupied,
+            Dailybuses: item.Dailybuses,
+            Employee: item.Employee,
+            GETaccommodation: item.GETaccommodation,
+            GHtransitaccommodation: item.GHtransitaccommodation,
+            ID: item.ID,
+            LocationId: item.LocationId,
+            LocationTitle: item.LocationTitle,
+            Mealserved: item.Mealserved,
+            Monthlyhirecar: item.Monthlyhirecar,
+            Title: item.Title,
+            Totalstaff: item.Totalstaff,
+            Townshipaccommodation: item.Townshipaccommodation,
+            Week: item.Week
+        });
+    }
+    private UpdateLocationInventory(updateditem: ILocationInventory): void {
+        const index: number =
+            lodash.findIndex(
+                this.weekLocationInventory, (o) => {
+                    return o.LocationTitle == updateditem.LocationTitle && o.Week == updateditem.Week;
+                }
+            );
+        if (index !== -1) {
+            this.weekLocationInventory[index] = updateditem;
+        }
+    }
+    private UpdateEventIncident(updateditem: IKPILocationEventIncidentItem): void {
+        const index: number =
+            lodash.findIndex(
+                this.weekEventIncident, (o) => { return o.EventIncidentID == updateditem.EventIncidentID; }
+            );
+        if (index !== -1) {
+            this.weekEventIncident[index] = updateditem;
+        }
+    }
+    private DeleteEventIncident(deleteitem: IKPILocationEventIncidentItem): void {
+        this.weekEventIncident = this.weekEventIncident.filter((val: IKPILocationEventIncidentItem) => {
+            return val.EventIncidentID !== deleteitem.EventIncidentID;
         });
     }
     public set webPartContext(value: IWebPartContext) {
@@ -69,6 +231,44 @@ export class MockData implements IKPIInputFormDataProvider {
         return this._webPartContext;
     }
 
+
+
+    private getDummyKPIMatircCurrentWeekData(): any {
+        return {
+            "d": {
+                "results": [
+                    {
+                        "__metadata": {
+                            "id": "dd3187c7-32ae-4ecf-a1b7-7017ae123f69",
+                            "uri": "http://sidcitspqaapp02:8080/sites/CSKPI/_api/Web/Lists(guid'5ed2dbc8-f092-4df6-9c39-9f1189cfa064')/Items(1)",
+                            "etag": "\"1\"",
+                            "type": "SP.Data.TransactionmetricListItem"
+                        },
+                        "Location": {
+                            "__metadata": {
+                                "id": "001e781e-bb16-48c1-af7a-783c604cd9e1",
+                                "type": "SP.Data.LocationListItem"
+                            },
+                            "Title": "DMD",
+                            "ID": 1
+                        },
+                        "KPITarget": {
+                            "__metadata": {
+                                "id": "f05ff97f-6ff2-4aab-ab53-03cead7f42f6",
+                                "type": "SP.Data.KPITargetListItem"
+                            },
+                            "Title": "0",
+                            "ID": 1
+                        },
+                        "Title": "2018",
+                        "Week": "1",
+                        "Metricvalue": 0,
+                        "Remark": "NA"
+                    }
+                ]
+            }
+        };
+    }
 
     private getDummyKpiMatriclist(): any {
         return {
@@ -195,10 +395,11 @@ export class MockData implements IKPIInputFormDataProvider {
                         "ID": 19
                     }
                 ]
-            }};
+            }
+        };
     }
 
-    private getDummyLocationEventIncidentlist():any{
+    private getDummyLocationEventIncidentlist(): any {
         return {
             "d": {
                 "results": [
@@ -270,27 +471,189 @@ export class MockData implements IKPIInputFormDataProvider {
         };
     }
 
-    public AddKPIEventIncident(newItem:IKPILocationEventIncidentItem):Promise<IKPILocationEventIncidentItem[]>{     
-        this.AddEventIncident(newItem);
-        return this.getKPIEventIncidentForTheWeekOfLocation(newItem.LocationTitle);
+    private getDummyLocationInventorylist(): any {
+
+        //$Select=Title,Week,Areainacres,Builtupofficespacearea,Cubicleinventory,Cabininventory,Cubicleoccupied,Cabinoccupied,Employee,            Totalstaff,Townshipaccommodation,GHtransitaccommodation,GETaccommodation,Mealserved,Dailybuses,Monthlyhirecar,ID,Location/ID,Location/Title&$expand=Location
+        return {
+            "d": {
+                "results": [
+                    {
+                        "__metadata": {
+                            "id": "785be541-a722-49e8-b7eb-183c05b57bc3",
+                            "uri": "http://sidcitspqaapp02:8080/sites/CSKPI/_api/Web/Lists(guid'1fd018e9-b4fe-4fa5-a832-6975c3ca1b6d')/Items(1)",
+                            "etag": "\"2\"",
+                            "type": "SP.Data.LocationInventoryListItem"
+                        },
+                        "Location": {
+                            "__metadata": {
+                                "id": "02201a56-1956-4dba-9128-54adeb8ab2a1",
+                                "type": "SP.Data.LocationListItem"
+                            },
+                            "ID": 1,
+                            "Title": "DMD"
+                        },
+                        "Id": 1,
+                        "Title": "2018",
+                        "Week": "27",
+                        "Areainacres": "1620",
+                        "Builtupofficespacearea": "262000",
+                        "Cubicleinventory": "353",
+                        "Cabininventory": "90",
+                        "Cubicleoccupied": "353",
+                        "Cabinoccupied": "88",
+                        "Employee": "2017",
+                        "Totalstaff": "5278",
+                        "Townshipaccommodation": "1280",
+                        "GHtransitaccommodation": "82",
+                        "GETaccommodation": "95",
+                        "Mealserved": "1337",
+                        "Dailybuses": "25",
+                        "Monthlyhirecar": "42",
+                        "ID": 1
+                    }
+                ]
+            }
+        };
     }
-    public getKPIEventIncidentForTheWeekOfLocation(locationName:string):Promise<IKPILocationEventIncidentItem[]>{
-        let item= this.weekEventIncident.filter((val , index) => {
-            return val["LocationTitle"] == locationName;
-        });      
+
+    public DMLKPIOperationalMetric(items: IOperationMetric[]): Promise<any> {
+
+        items.map((val: IOperationMetric) => {
+            /* if(val.status =="save"){
+             //this.AddKPIOprationMetric(val);
+             this.weekOperationMetric.push(val);
+             }else{
+                 this.UpdateKPIOperationMetric(val);
+             }*/
+            this.UpdateKPIOperationMetric(val);
+        });
+        return new Promise<any>((resolve) => {
+            setTimeout(() => {
+                resolve(items);
+            }, 500);
+        });
+
+
+    }
+
+    private UpdateKPIOperationMetric(item: IOperationMetric): void {
+        const index: number =
+            lodash.findIndex(
+                this.weekOperationMetric, (o) => { return o.transactionMetricId == item.transactionMetricId; }
+            );
+        if (index !== -1) {
+            this.weekOperationMetric[index] = item;
+        }
+    }
+
+    public AddKPIEventIncident(newItem: IKPILocationEventIncidentItem): Promise<IKPILocationEventIncidentItem[]> {
+        this.AddEventIncident(newItem);
+        return this.getKPIEventIncidentForTheWeekOfLocation(
+        { location:{name:newItem.LocationTitle, id:newItem.LocationID},
+        week:newItem.Week,
+         year:newItem.Year
+        }       
+    );
+    }
+    public UpdateKPIEventIncident(updateitem: IKPILocationEventIncidentItem): Promise<IKPILocationEventIncidentItem[]> {
+        this.UpdateEventIncident(updateitem);
+        return this.getKPIEventIncidentForTheWeekOfLocation({
+            location:{name:updateitem.LocationTitle, id:updateitem.LocationID},
+            week: updateitem.Week, year: updateitem.Year
+        });
+    }
+
+    public DeleteKPIEventIncident(updateitem: IKPILocationEventIncidentItem): Promise<IKPILocationEventIncidentItem[]> {
+
+        this.DeleteEventIncident(updateitem);
+        return this.getKPIEventIncidentForTheWeekOfLocation(
+        {
+            location: { id: updateitem.LocationID, name: updateitem.LocationTitle },
+            week: updateitem.Week, year: updateitem.Year
+        }
+    );
+    }
+
+    public AddKPILocationInventory(newItem: ILocationInventory): Promise<ILocationInventory> {
+        this.AddLocationInventory(newItem);
+        return this.getKPILocationInventoryForTheWeekOfLocation(
+        {
+            location: { id: newItem.LocationId, name: newItem.LocationTitle },
+            week: newItem.Week, year: ''
+        }
+    );
+    }
+    public UpdateKPILocationInventorys(updateItem: ILocationInventory): void {
+
+    }
+    public UpdateKPILocationInventory(updateItem: ILocationInventory): Promise<ILocationInventory> {
+        this.UpdateLocationInventory(updateItem);
+        return this.getKPILocationInventoryForTheWeekOfLocation(
+            {
+                location: { id: updateItem.LocationId, name: updateItem.LocationTitle },
+                week: updateItem.Week, year: ''
+            });
+    }
+    public getKPIEventIncidentForTheWeekOfLocation(locationName: ICSKPIProps): Promise<IKPILocationEventIncidentItem[]> {
+        let item = this.weekEventIncident.filter((val, index) => {
+            return val["LocationTitle"] == locationName.location.name;
+        });
         return new Promise<IKPILocationEventIncidentItem[]>((resolve) => {
             setTimeout(() => {
-               resolve(item); 
+                resolve(item);
             }, 500);
         });
     }
-    public getKPIMatric():Promise<IKPIItem[]>{
+    public getKPIMatric(): Promise<IKPIItem[]> {
         let item = this.weekTargetList;
         return new Promise<IKPIItem[]>((resolve) => {
             setTimeout(() => {
                 resolve(item);
             }, 500);
         });
+    }
+
+    public getKPILocationInventoryForTheWeekOfLocation(locationName: ICSKPIProps): Promise<ILocationInventory> {
+        let item: ILocationInventory;
+        const index: number =
+            lodash.findIndex(
+                this.weekLocationInventory, (o) => { return o.LocationTitle == locationName.location.name; }
+            );
+        if (index !== -1) {
+            item = this.weekLocationInventory[index];
+        }
+        /*      let item = this.weekLocationInventory.filter((val, index) => {
+            return val["LocationTitle"] == locationName;
+        });*/
+        return new Promise<ILocationInventory>((resolve) => {
+            setTimeout(() => {
+                resolve(item);
+            }, 500);
+        });
+    }
+
+    public getKPIOperationalMertic(locationName: ICSKPIProps): Promise<IOperationMetric[]> {
+        let item = this.weekOperationMetric;
+        return new Promise<IOperationMetric[]>((resolve) => {
+            setTimeout(() => {
+                resolve(item);
+            }, 500);
+        });
+    }
+
+    public getLocation(): Promise<any[]> {
+        let location: any = this.getList();
+        return new Promise<any[]>((resolve) => {
+            setTimeout(() => {
+                resolve(location);
+            }, 500);
+        });
+
+    }
+
+    public getList(): any {
+        return [{ "Title": "DMD", "ID": 1 }, { "Title": "SMD", "ID": 2 }];
+
     }
 }
 

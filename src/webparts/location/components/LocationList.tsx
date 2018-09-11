@@ -89,8 +89,7 @@ class Locationrow extends React.Component<rowDetails, {}> {
  public render() {
     let item = this.props.row;
     return (
-      <tr>
-        <td>{}</td>
+      <tr>       
         <td id="name" data-id={item.ID}>
           {item.Title}
         </td>

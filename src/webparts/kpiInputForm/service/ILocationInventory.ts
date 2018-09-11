@@ -2,7 +2,7 @@ export interface ILocationInventory{
     ID:number;
     Title:string;
     Week:string;
-    LocationId:number
+    LocationId:number;
     LocationTitle:string;
     Areainacres:string;
     Builtupofficespacearea:string;

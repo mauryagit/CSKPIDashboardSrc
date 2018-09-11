@@ -21,3 +21,14 @@ export interface IKPILocationEventIncidentItem extends IKPIInputCriteria{
     LocationTitle:string;
     LocationID:number;
 }
+
+export interface ICSKPIProps{
+    location:Location;
+    year: string;
+    week: string;
+  }
+
+  export interface Location{
+    id:number;
+    name:string;
+  }
